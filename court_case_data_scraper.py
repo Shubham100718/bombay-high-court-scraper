@@ -32,9 +32,9 @@ class Court_Case_Scraper:
             court_cases_payload = f"CSRFName={csrf_name}&CSRFToken={csrf_token}&m_hc={self.input_data.get('court_code')}&m_side={self.input_data.get('case_side')}&pageno=1&m_party={self.input_data.get('party_name')}&petres={self.input_data.get('party_type')}&myr={self.input_data.get('case_year')}&captchaflg=&captcha_code={captcha_text}&submit1=Submit"
 
             court_cases_response = self.session.post("https://bombayhighcourt.nic.in/partyquery_action.php", headers=html_page_headers, data=court_cases_payload)
-            soup = BeautifulSoup(court_cases_response.content, 'lxml')
-            if soup.select('div.table.table-responsive>table>tr>td') != []:
-                party_data_list = soup.select('div.table.table-responsive>table>tr')[2:]
+            first_page_soup = BeautifulSoup(court_cases_response.content, 'lxml')
+            if first_page_soup.select('div.table.table-responsive>table>tr>td') != []:
+                party_data_list = first_page_soup.select('div.table.table-responsive>table>tr')[2:]
         
         elif selector=='API':
             if soup.select('div.table-responsive>table>table>tr>td') == []:
@@ -60,7 +60,7 @@ class Court_Case_Scraper:
 
                 self.all_court_case_data.append(Court_Case_Data(sr_no,case_detail,case_type,case_no,case_year,party_name,petitioner,respondent,bench,case_category))
 
-    def __extract_data_from_paginattion(self) -> Optional[BeautifulSoup]:
+    def __extract_data_from_paginattion(self) -> None:
                 
         count = 100
         while True:
